@@ -529,6 +529,9 @@ function v4aEdits(lines: string[]): Edit[] {
         k += 1;
       }
       let chunk: VChunk | null = null;
+      // SPEC.md section 8: a chunk starts at an `@@` line or, for the first chunk only, at a body
+      // line. Once a chunk has ended (`*** End of File`), a bare body line cannot start another one.
+      let seenChunk = false;
       while (k < content.length) {
         const c = content[k]!;
         const t = c.text;
@@ -538,6 +541,7 @@ function v4aEdits(lines: string[]): Edit[] {
             chunk = null;
           }
           chunk = { anchor: t.slice(2).trim() || null, body: [], o: [], n: [], eof: false };
+          seenChunk = true;
           k += 1;
           continue;
         }
@@ -550,7 +554,11 @@ function v4aEdits(lines: string[]): Edit[] {
           continue;
         }
         if (t.startsWith(' ') || t.startsWith('-') || t.startsWith('+') || t === '') {
-          if (chunk === null) chunk = { anchor: null, body: [], o: [], n: [], eof: false };
+          if (chunk === null) {
+            if (seenChunk) throw new Exit2(`error: parse ${c.line}`);
+            chunk = { anchor: null, body: [], o: [], n: [], eof: false };
+            seenChunk = true;
+          }
           chunk.body.push({ type: (t[0] ?? ' ') as ' ' | '-' | '+', text: t === '' ? '' : t.slice(1) });
           k += 1;
           continue;
