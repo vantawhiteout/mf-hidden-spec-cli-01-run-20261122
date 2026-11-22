@@ -779,13 +779,16 @@ function run(args: string[]): { code: number; out: string[] } {
   const fails: Fail[] = [];
   for (const edit of edits) {
     const before = new Map(tree.now);
+    const beforeMoves = [...tree.moves];
     try {
       edit(tree);
     } catch (e) {
       if (!(e instanceof Fail)) throw e;
+      // A failed edit changes nothing: roll back both its file changes and its move records.
       tree.now.clear();
       tree.moves.length = 0;
       for (const [k, v] of before) tree.now.set(k, v);
+      for (const m of beforeMoves) tree.moves.push(m);
       fails.push(e);
     }
   }
