@@ -134,9 +134,9 @@ function occurrences(o: string[], lines: string[], tier: Tier, from: number, str
 }
 
 /** The first tier with an occurrence, and the occurrences at it. */
-function findOccurrences(o: string[], lines: string[], from: number): { tier: Tier; at: number[] } | null {
+function findOccurrences(o: string[], lines: string[], from: number, endAtFileEnd = false): { tier: Tier; at: number[] } | null {
   for (const tier of strictMode ? TIER_KEYS.slice(0, 1) : TIERS) {
-    const at = occurrences(o, lines, tier, from, strictMode);
+    const at = occurrences(o, lines, tier, from, strictMode).filter((p) => !endAtFileEnd || p + o.length === lines.length);
     if (at.length > 0) return { tier, at };
   }
   return null;
@@ -406,7 +406,10 @@ function searchReplaceEdits(lines: string[]): Edit[] {
     let repl = -1;
     for (let j = search + 1; j < lines.length; j += 1) {
       if (eq < 0 && lines[j]!.trimEnd() === '=======') eq = j;
-      else if (eq >= 0 && lines[j]!.trimEnd() === '>>>>>>> REPLACE') {
+      else if (eq < 0 && lines[j]!.trimEnd() === '>>>>>>> REPLACE') {
+        // A REPLACE marker before any ======= means there is no "======= and then REPLACE after it".
+        throw new Exit2(`error: parse ${search + 1}`);
+      } else if (eq >= 0 && lines[j]!.trimEnd() === '>>>>>>> REPLACE') {
         repl = j;
         break;
       }
@@ -610,12 +613,10 @@ function v4aEdit(s: VSection): Edit {
       if (chunk.o.length === 0) {
         pos = chunk.eof ? f.lines.length : from;
       } else {
-        const found = findOccurrences(chunk.o, f.lines, from);
+        const found = findOccurrences(chunk.o, f.lines, from, chunk.eof);
         if (found === null) throw new Fail('no-match', s.path);
         tier = found.tier;
-        const choices = chunk.eof ? found.at.filter((p) => p + chunk.o.length === f.lines.length) : found.at;
-        if (choices.length === 0) throw new Fail('no-match', s.path);
-        pos = choices[0]!;
+        pos = found.at[0]!;
       }
       const nLines = writtenLines(chunk.n, chunk.o, f.lines, pos, tier);
       f.lines = spliceLines(f.lines, pos, chunk.o.length, nLines);
