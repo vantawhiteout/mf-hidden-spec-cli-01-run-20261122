@@ -620,6 +620,9 @@ function v4aEdit(s: VSection): Edit {
       let pos: number;
       if (chunk.o.length === 0) {
         pos = chunk.eof ? f.lines.length : from;
+        // No O means no occurrence of O, so no tier at which O was found: section 5's
+        // tier-2 reindentation has no basis here. The anchor only locates the cursor.
+        tier = 0;
       } else {
         const found = findOccurrences(chunk.o, f.lines, from, chunk.eof);
         if (found === null) throw new Fail('no-match', s.path);
