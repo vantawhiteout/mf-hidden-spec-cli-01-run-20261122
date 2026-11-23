@@ -24,6 +24,13 @@ check this command cannot run locally (the site runs it at submission). `kit ...
 whole output, not just from stderr, so a transient or truncated read is not mistaken for a
 repository failure.
 
+From the repository root, `npm run check` runs that exact command through the wrapper in
+`scripts/check.mjs`. The wrapper keeps the full output but adds one authoritative verdict
+line (`pre-submit check: PASS` or `pre-submit check: FAIL`) derived from the command's exit
+code and its `N passed, N failed, ...` summary row, and exits 0 only when both say there
+are no failed rows. Use it when capturing output automatically: grepping raw stderr for
+failures reports the kit's progress line as a false failure.
+
 `transcripts.tar.gz` is a real bundle of the recorded OpenCode sessions that built this
 entry, collected with the kit's `makefun bundle` command. It is committed here so the
 bundle used for the check is the exact one uploaded with the entry; it is not written

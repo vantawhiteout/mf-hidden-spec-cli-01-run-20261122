@@ -20,11 +20,12 @@ npm start
 
 ```sh
 npm test
-node hidden-spec-cli-01-run-20261122-kit/cli/makefun.mjs check \
-  --kit hidden-spec-cli-01-run-20261122-kit --repo . --transcripts transcripts.tar.gz
+npm run check
 ```
 
-Both commands run from the repository root. See PRE_SUBMIT.md for details.
+Both commands run from the repository root. `npm run check` wraps the site's check and prints a single
+`pre-submit check: PASS`/`FAIL` verdict from the real exit code and summary row; the kit's
+`verified 34 files` line on stderr is progress, not a failure. See PRE_SUBMIT.md for details.
 
 ---
 
