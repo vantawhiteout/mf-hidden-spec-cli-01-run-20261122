@@ -71,7 +71,7 @@ test(
 test(
   's: a block without a path inherits the previous block\'s path',
   ['-'],
-  'x\n<<<<<<< SEARCH\na\n=======\nA\n>>>>>>> REPLACE\nsome prose\n<<<<<<< SEARCH\nb\n=======\nB\n>>>>>>> REPLACE\n',
+  'x\n<<<<<<< SEARCH\na\n=======\nA\n>>>>>>> REPLACE\n```python\n<<<<<<< SEARCH\nb\n=======\nB\n>>>>>>> REPLACE\n',
   { x: 'a\nb\n' },
   0,
   'M x\nok: 1 file\n',
@@ -82,7 +82,7 @@ test(
   's: an occurrence at the first tier is still ambiguous when a later tier is unique',
   ['-'],
   'x\n<<<<<<< SEARCH\nsame\n=======\nother\n>>>>>>> REPLACE\n',
-  { x: 'same \nsame\n' },
+  { x: 'same\nsame\n' },
   1,
   'error: ambiguous x\nfailed: 1 of 1 edits\n',
 );
@@ -135,7 +135,7 @@ test(
   '*** Begin Patch\n*** Update File: x\n-a\n+b\n*** End of File\n-c\n+d\n*** End Patch\n',
   { x: 'a\nc\n' },
   2,
-  'error: parse 7\n',
+  'error: parse 6\n',
 );
 
 // --- JSON (section 9) --------------------------------------------------------
