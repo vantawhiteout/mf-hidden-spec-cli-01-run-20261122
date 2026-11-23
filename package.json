@@ -1,0 +1,12 @@
+{
+  "name": "mf-hidden-spec-cli-01-run-20261122",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "mend: one patch tool for every AI edit format",
+  "license": "MIT",
+  "scripts": {
+    "start": "node main.ts",
+    "test": "node tests/spec.test.mjs && node check.ts hidden-spec-cli-01-run-20261122-kit/program/generator/practice.json"
+  }
+}
